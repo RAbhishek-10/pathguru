@@ -1,0 +1,331 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  FACULTY
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum BatchMode {
+  ONLINE
+  OFFLINE
+  HYBRID
+}
+
+enum BatchStatus {
+  ACTIVE
+  UPCOMING
+  ARCHIVED
+}
+
+model User {
+  id            String     @id @default(cuid())
+  name          String
+  email         String     @unique
+  phone         String?
+  passwordHash  String
+  avatar        String?
+  role          Role       @default(STUDENT)
+  status        UserStatus @default(ACTIVE)
+  examTarget    String?
+  walletBalance Float      @default(0)
+  referralCode  String     @unique
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  facultyProfile  FacultyProfile?
+  enrollments     Enrollment[]
+  lectureProgress LectureProgress[]
+  testResults     TestResultRecord[]
+  batchesCreated  Batch[]            @relation("BatchCreator")
+  doubts          Doubt[]
+  notifications   Notification[]
+  orders          Order[]
+  purchases       Purchase[]
+}
+
+model FacultyProfile {
+  id         String @id @default(cuid())
+  userId     String @unique
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject    String
+  experience Int    @default(0)
+  bio        String?
+
+  batchFaculty BatchFaculty[]
+}
+
+model Batch {
+  id              String      @id @default(cuid())
+  title           String
+  slug            String      @unique
+  examSlug        String
+  description     String
+  price           Float
+  discountedPrice Float
+  thumbnail       String      @default("/placeholder.svg?height=400&width=600")
+  rating          Float       @default(0)
+  reviewCount     Int         @default(0)
+  enrolledCount   Int         @default(0)
+  mode            BatchMode   @default(ONLINE)
+  startDate       DateTime
+  status          BatchStatus @default(ACTIVE)
+  tags            String      @default("[]")
+  features        String      @default("[]")
+  creatorId       String?
+  creator         User?       @relation("BatchCreator", fields: [creatorId], references: [id])
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  faculty     BatchFaculty[]
+  lectures    Lecture[]
+  enrollments Enrollment[]
+}
+
+model BatchFaculty {
+  batchId   String
+  facultyId String
+  batch     Batch          @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  faculty   FacultyProfile @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+
+  @@id([batchId, facultyId])
+}
+
+model Lecture {
+  id        String  @id @default(cuid())
+  batchId   String
+  batch     Batch   @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  title     String
+  duration  String
+  thumbnail String  @default("/placeholder.svg?height=120&width=200")
+  subject   String
+  isFree    Boolean @default(false)
+  videoUrl  String?
+  sortOrder Int     @default(0)
+
+  progress LectureProgress[]
+}
+
+model Enrollment {
+  id         String   @id @default(cuid())
+  userId     String
+  batchId    String
+  progress   Float    @default(0)
+  enrolledAt DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  batch      Batch    @relation(fields: [batchId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, batchId])
+}
+
+model LectureProgress {
+  id             String  @id @default(cuid())
+  userId         String
+  lectureId      String
+  completed      Boolean @default(false)
+  watchedSeconds Int     @default(0)
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lecture        Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lectureId])
+}
+
+model Note {
+  id        String  @id @default(cuid())
+  title     String
+  examSlug  String
+  subject   String
+  type      String
+  pages     Int
+  price     Float   @default(0)
+  isFree    Boolean @default(false)
+  thumbnail String  @default("/placeholder.svg?height=300&width=200")
+  fileUrl   String?
+}
+
+model ExamCategory {
+  slug        String @id
+  name        String
+  icon        String
+  description String
+  color       String
+  sortOrder   Int    @default(0)
+}
+
+model TestSeries {
+  id             String     @id @default(cuid())
+  title          String
+  examSlug       String
+  totalQuestions Int
+  duration       Int
+  totalMarks     Int
+  mode           String
+  scheduledDate  DateTime?
+  price          Float      @default(0)
+  isFree         Boolean    @default(false)
+  attemptsCount  Int        @default(0)
+  averageScore   Float      @default(0)
+  questions      Question[]
+}
+
+model Question {
+  id            String     @id @default(cuid())
+  testSeriesId  String
+  testSeries    TestSeries @relation(fields: [testSeriesId], references: [id], onDelete: Cascade)
+  type          String
+  stem          String
+  options       String     @default("[]")
+  section       String
+  marks         Int
+  negativeMarks Int
+  imageUrl      String?
+  sortOrder     Int        @default(0)
+}
+
+model LiveClass {
+  id           String   @id @default(cuid())
+  title        String
+  subject      String
+  facultyName  String
+  batchName    String
+  startTime    DateTime
+  endTime      DateTime
+  status       String
+  recordingUrl String?
+}
+
+model Book {
+  id              String  @id @default(cuid())
+  title           String
+  author          String
+  price           Float
+  discountedPrice Float?
+  thumbnail       String  @default("/placeholder.svg?height=400&width=300")
+  description     String
+  pages           Int
+  inStock         Boolean @default(true)
+  rating          Float   @default(0)
+}
+
+model BlogPost {
+  slug      String   @id
+  title     String
+  excerpt   String
+  thumbnail String
+  author    String
+  date      DateTime
+  readTime  String
+}
+
+model Topper {
+  id     String @id @default(cuid())
+  name   String
+  rank   Int
+  exam   String
+  year   Int
+  avatar String
+  quote  String
+}
+
+model Testimonial {
+  id     String @id @default(cuid())
+  name   String
+  rating Int
+  quote  String
+  exam   String
+  avatar String
+}
+
+model ScholarshipRegistration {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String
+  email     String
+  exam      String
+  createdAt DateTime @default(now())
+}
+
+model Doubt {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject         String
+  topic           String
+  question        String
+  status          String
+  aiResponse      String?
+  aiConfidence    Float?
+  facultyResponse String?
+  createdAt       DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Order {
+  id         String      @id @default(cuid())
+  userId     String
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subtotal   Float
+  discount   Float       @default(0)
+  tax        Float       @default(0)
+  total      Float
+  couponCode String?
+  status     String      @default("completed")
+  items      OrderItem[]
+  createdAt  DateTime    @default(now())
+}
+
+model OrderItem {
+  id        String @id @default(cuid())
+  orderId   String
+  order     Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  itemType  String
+  itemId    String
+  title     String
+  price     Float
+}
+
+model Purchase {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemType  String
+  itemId    String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, itemType, itemId])
+}
+
+model TestResultRecord {
+  id          String   @id @default(cuid())
+  userId      String
+  testId      String
+  testName    String
+  score       Float
+  totalMarks  Float
+  rank        Int
+  percentile  Float
+  completedAt DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
