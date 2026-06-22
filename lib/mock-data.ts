@@ -91,7 +91,7 @@ export const notes: Note[] = [
 export const blogPosts: BlogPost[] = [
   { slug: "neet-2026-preparation-strategy", title: "NEET 2026: Complete Preparation Strategy", excerpt: "A detailed roadmap for NEET aspirants covering monthly targets, study hours, and subject-wise tips.", thumbnail: "/placeholder.svg?height=200&width=400", author: "Dr. Priya Sharma", date: "2025-06-01", readTime: "8 min" },
   { slug: "jee-mains-vs-advanced", title: "JEE Mains vs Advanced: Key Differences", excerpt: "Understanding the exam patterns, difficulty levels, and preparation strategies for both JEE exams.", thumbnail: "/placeholder.svg?height=200&width=400", author: "Prof. Amit Singh", date: "2025-05-28", readTime: "6 min" },
-  { slug: "time-management-competitive-exams", title: "Time Management Tips for Competitive Exams", excerpt: "Proven strategies to manage your time effectively during preparation and on exam day.", thumbnail: "/placeholder.svg?height=200&width=400", author: "TrueEducator Team", date: "2025-05-20", readTime: "5 min" },
+  { slug: "time-management-competitive-exams", title: "Time Management Tips for Competitive Exams", excerpt: "Proven strategies to manage your time effectively during preparation and on exam day.", thumbnail: "/placeholder.svg?height=200&width=400", author: "PathGuru Team", date: "2025-05-20", readTime: "5 min" },
 ]
 
 export const liveClasses: LiveClass[] = [
@@ -108,7 +108,7 @@ export const books: Book[] = [
 ]
 
 export const toppers: Topper[] = [
-  { name: "Aarav Patel", rank: 1, exam: "NEET 2025", year: 2025, avatar: "/placeholder.svg?height=200&width=200", quote: "TrueEducator's structured approach helped me achieve AIR 1" },
+  { name: "Aarav Patel", rank: 1, exam: "NEET 2025", year: 2025, avatar: "/placeholder.svg?height=200&width=200", quote: "PathGuru's structured approach helped me achieve AIR 1" },
   { name: "Sneha Reddy", rank: 3, exam: "JEE Advanced 2025", year: 2025, avatar: "/placeholder.svg?height=200&width=200", quote: "The test series were exactly like the real exam" },
   { name: "Rohan Mehta", rank: 5, exam: "NEET 2025", year: 2025, avatar: "/placeholder.svg?height=200&width=200", quote: "AI doubt resolution saved me hours of waiting" },
   { name: "Priya Joshi", rank: 12, exam: "JEE Mains 2025", year: 2025, avatar: "/placeholder.svg?height=200&width=200", quote: "Best faculty and study material for JEE prep" },
@@ -119,7 +119,7 @@ export const testimonials: Testimonial[] = [
   { name: "Vikash Singh", rating: 5, quote: "The best online coaching platform I've used. Faculty are incredible and the AI doubt feature is a game-changer.", exam: "NEET", avatar: "/placeholder.svg?height=100&width=100" },
   { name: "Ananya Kumari", rating: 5, quote: "Affordable pricing with premium quality content. The test series helped me improve my score by 150 marks.", exam: "JEE Mains", avatar: "/placeholder.svg?height=100&width=100" },
   { name: "Mohit Verma", rating: 4, quote: "Great study material and regular live classes. The offline centres are well-maintained too.", exam: "NEET", avatar: "/placeholder.svg?height=100&width=100" },
-  { name: "Kavya Sharma", rating: 5, quote: "From scoring 400 in mocks to 680 in actual NEET - all thanks to TrueEducator!", exam: "NEET", avatar: "/placeholder.svg?height=100&width=100" },
+  { name: "Kavya Sharma", rating: 5, quote: "From scoring 400 in mocks to 680 in actual NEET - all thanks to PathGuru!", exam: "NEET", avatar: "/placeholder.svg?height=100&width=100" },
 ]
 
 export const lectures: Lecture[] = [

@@ -14,11 +14,15 @@ const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono"
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | TrueEducator",
-    default: "TrueEducator — India's Best Exam Prep Platform",
+    template: "%s | PathGuru",
+    default: "PathGuru — Learn. Grow. Succeed.",
   },
-  description: "Live classes, test series, notes & AI doubt resolution for NEET, JEE, GATE, UPSC, CTET & more. Join 50,000+ students.",
-  keywords: ["NEET preparation", "JEE coaching", "GATE test series", "exam prep India", "online coaching"],
+  description: "Live classes, test series, notes & AI doubt resolution for NEET, JEE, GATE, UPSC, CTET & more. Your path to academic excellence starts here.",
+  keywords: ["NEET preparation", "JEE coaching", "GATE test series", "exam prep India", "PathGuru", "online coaching"],
+  icons: {
+    icon: "/banner.png",
+    apple: "/banner.png",
+  },
 }
 
 export default function RootLayout({

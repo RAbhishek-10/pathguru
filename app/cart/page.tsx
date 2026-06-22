@@ -90,7 +90,7 @@ export default function CartPage() {
           key: orderData.keyId,
           amount: orderData.amount * 100,
           currency: orderData.currency,
-          name: "TrueEducator",
+          name: "PathGuru",
           description: "Course and Test Prep Subscription",
           order_id: orderData.orderId,
           handler: async (response: any) => {

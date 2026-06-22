@@ -23,40 +23,44 @@ interface HomeData {
 /* ─── Hero Section ─── */
 function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-primary/[0.03] via-background to-primary/[0.06]">
-      <div className="mx-auto flex max-w-7xl flex-col items-center gap-8 px-4 py-16 text-center lg:py-24 lg:px-6">
-        <Badge variant="secondary" className="gap-1.5 border border-primary/20 bg-primary/5 text-primary">
-          <Sparkles className="h-3.5 w-3.5" /> {"India's #1 Exam Prep Platform"}
+    <section className="relative overflow-hidden pg-gradient-hero">
+      {/* Decorative blobs */}
+      <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-[#1E88FF]/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-32 top-20 h-80 w-80 rounded-full bg-[#FF7A1A]/10 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-0 left-1/2 h-64 w-[600px] -translate-x-1/2 rounded-full bg-[#0A4DBF]/5 blur-3xl" />
+
+      <div className="relative mx-auto flex max-w-7xl flex-col items-center gap-8 px-4 py-20 text-center lg:py-28 lg:px-6">
+        <Badge variant="secondary" className="animate-fade-in gap-1.5 rounded-full border border-[#0A4DBF]/20 bg-white px-4 py-1.5 text-[#0A4DBF] shadow-sm">
+          <Sparkles className="h-3.5 w-3.5 text-[#FF7A1A]" /> The Future of Learning
         </Badge>
-        <h1 className="max-w-4xl text-balance text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl lg:text-6xl">
-          Your Path to <span className="text-primary">Academic Excellence</span> Starts Here
+        <h1 className="animate-fade-in-up max-w-4xl text-balance text-4xl font-extrabold leading-[1.1] tracking-tight text-foreground md:text-5xl lg:text-6xl">
+          Your <span className="pg-text-gradient">Learning Path</span> to Academic Excellence
         </h1>
-        <p className="max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground md:text-lg">
-          Live classes, comprehensive test series, AI-powered doubt resolution, and expert faculty for NEET, JEE, GATE, UPSC & more. Join 50,000+ successful students.
+        <p className="animate-fade-in-up max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground md:text-lg" style={{ animationDelay: "0.1s" }}>
+          Live classes, comprehensive test series, AI-powered doubt resolution, and expert faculty for NEET, JEE, GATE, UPSC & more. Join 50,000+ successful students on PathGuru.
         </p>
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          <Link href="/exam-categories">
-            <Button size="lg" className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
+        <div className="animate-fade-in-up flex flex-wrap items-center justify-center gap-3" style={{ animationDelay: "0.2s" }}>
+          <Button size="lg" className="gap-2" asChild>
+            <Link href="/exam-categories">
               Explore Courses <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
-          <Link href="/scholarship">
-            <Button size="lg" variant="outline" className="gap-2">
+            </Link>
+          </Button>
+          <Button size="lg" variant="cta" className="gap-2" asChild>
+            <Link href="/scholarship">
               Free Scholarship Test
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
-        {/* Stats inline */}
-        <div className="mt-4 flex flex-wrap items-center justify-center gap-6 md:gap-10">
+        <div className="animate-fade-in-up mt-6 grid w-full max-w-3xl grid-cols-2 gap-4 sm:grid-cols-4" style={{ animationDelay: "0.3s" }}>
           {[
-            { value: "50,000+", label: "Students" },
-            { value: "500+", label: "Live Classes" },
-            { value: "15+", label: "Centres" },
-            { value: "95%", label: "Satisfaction" },
+            { value: "50,000+", label: "Students", color: "text-[#0A4DBF]" },
+            { value: "500+", label: "Live Classes", color: "text-[#1E88FF]" },
+            { value: "15+", label: "Centres", color: "text-[#0A4DBF]" },
+            { value: "95%", label: "Satisfaction", color: "text-[#FF7A1A]" },
           ].map((stat) => (
-            <div key={stat.label} className="text-center">
-              <p className="text-xl font-bold text-foreground md:text-2xl">{stat.value}</p>
-              <p className="text-xs text-muted-foreground">{stat.label}</p>
+            <div key={stat.label} className="rounded-2xl border border-border/50 bg-white/80 px-4 py-4 shadow-sm backdrop-blur-sm">
+              <p className={`text-xl font-extrabold md:text-2xl ${stat.color}`}>{stat.value}</p>
+              <p className="mt-0.5 text-xs font-medium text-muted-foreground">{stat.label}</p>
             </div>
           ))}
         </div>
@@ -68,8 +72,8 @@ function HeroSection() {
 /* ─── Announcement Ticker ─── */
 function AnnouncementTicker() {
   return (
-    <div className="overflow-hidden border-y border-border bg-primary/5">
-      <div className="animate-marquee flex whitespace-nowrap py-2.5">
+    <div className="overflow-hidden border-y border-[#0A4DBF]/10 bg-[#EEF5FF]">
+      <div className="animate-marquee flex whitespace-nowrap py-3">
         {[
           "NEET 2026 Arjuna Batch Now Open - Limited Seats!",
           "JEE Advanced Results: 15 Students in Top 100!",
@@ -77,8 +81,8 @@ function AnnouncementTicker() {
           "New: AI Doubt Resolution - Get Answers in Seconds",
           "GATE CSE Prayas Batch Starting Aug 2025",
         ].map((text, i) => (
-          <span key={i} className="mx-8 inline-flex items-center gap-2 text-sm font-medium text-primary">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+          <span key={i} className="mx-8 inline-flex items-center gap-2 text-sm font-semibold text-[#0A4DBF]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#FF7A1A]" />
             {text}
           </span>
         ))}
@@ -107,9 +111,9 @@ function ExamCategoryGrid({ examCategories }: { examCategories: ExamCategory[] }
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:gap-5">
         {examCategories.map((cat, i) => (
           <Link key={cat.slug} href={`/exam/${cat.slug}`}>
-            <Card className="group cursor-pointer border-border bg-card transition-all hover:border-primary/30 hover:shadow-md py-0">
-              <CardContent className="flex flex-col items-center p-5 text-center">
-                <div className={`mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br ${iconColors[i]} text-white shadow-sm`}>
+            <Card className="pg-card group cursor-pointer border-border/60 bg-card py-0">
+              <CardContent className="flex flex-col items-center p-6 text-center">
+                <div className={`mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${iconColors[i]} text-white shadow-md`}>
                   <BookOpen className="h-6 w-6" />
                 </div>
                 <h3 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{cat.name}</h3>
@@ -130,7 +134,7 @@ function FeaturedBatchesSection({ batches }: { batches: Batch[] }) {
     scrollRef.current?.scrollBy({ left: dir === "left" ? -320 : 320, behavior: "smooth" })
   }
   return (
-    <section className="bg-muted/50 py-16">
+    <section className="pg-section-alt py-16">
       <div className="mx-auto max-w-7xl px-4 lg:px-6">
         <div className="mb-10 flex items-end justify-between">
           <div>
@@ -248,17 +252,17 @@ function WhyChooseUs() {
     { icon: Users, title: "Community", desc: "Join a community of 50,000+ like-minded aspirants" },
   ]
   return (
-    <section className="bg-muted/50 py-16">
+    <section className="pg-section-alt py-16">
       <div className="mx-auto max-w-7xl px-4 lg:px-6">
         <div className="mb-10 text-center">
-          <h2 className="mb-3 text-2xl font-bold text-foreground md:text-3xl">Why Choose TrueEducator?</h2>
+          <h2 className="mb-3 text-2xl font-bold text-foreground md:text-3xl">Why Choose PathGuru?</h2>
           <p className="text-muted-foreground">Everything you need to crack your dream exam</p>
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f) => (
-            <Card key={f.title} className="border-border bg-card py-0">
+            <Card key={f.title} className="pg-card border-border/60 bg-card py-0">
               <CardContent className="flex items-start gap-4 p-5">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#EEF5FF] text-[#0A4DBF]">
                   <f.icon className="h-5 w-5" />
                 </div>
                 <div>
@@ -305,7 +309,7 @@ function FacultySection({ faculty }: { faculty: Faculty[] }) {
 /* ─── Toppers Showcase ─── */
 function ToppersSection({ toppers }: { toppers: Topper[] }) {
   return (
-    <section className="bg-muted/50 py-16">
+    <section className="pg-section-alt py-16">
       <div className="mx-auto max-w-7xl px-4 lg:px-6">
         <div className="mb-10 text-center">
           <h2 className="mb-3 text-2xl font-bold text-foreground md:text-3xl">Our Toppers</h2>
@@ -367,7 +371,7 @@ function BlogSection({ blogPosts }: { blogPosts: BlogPost[] }) {
 /* ─── Testimonials ─── */
 function TestimonialsSection({ testimonials }: { testimonials: Testimonial[] }) {
   return (
-    <section className="bg-muted/50 py-16">
+    <section className="pg-section-alt py-16">
       <div className="mx-auto max-w-7xl px-4 lg:px-6">
         <div className="mb-10 text-center">
           <h2 className="mb-3 text-2xl font-bold text-foreground md:text-3xl">What Our Students Say</h2>
@@ -403,8 +407,8 @@ function TestimonialsSection({ testimonials }: { testimonials: Testimonial[] }) 
 function DownloadAppCTA() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 lg:px-6">
-      <div className="overflow-hidden rounded-2xl bg-gradient-to-r from-primary to-primary/80 px-8 py-12 text-center text-primary-foreground md:px-16">
-        <h2 className="mb-3 text-2xl font-bold md:text-3xl">Download the TrueEducator App</h2>
+      <div className="overflow-hidden rounded-3xl pg-gradient-navy px-8 py-14 text-center text-white md:px-16">
+        <h2 className="mb-3 text-2xl font-bold md:text-3xl">Download the PathGuru App</h2>
         <p className="mx-auto mb-6 max-w-lg text-sm leading-relaxed opacity-90">
           Study on the go with our mobile app. Access live classes, take tests, and resolve doubts from anywhere.
         </p>
@@ -430,8 +434,10 @@ function CounsellorCTA() {
           <h3 className="text-lg font-semibold text-foreground">Need help choosing the right batch?</h3>
           <p className="text-sm text-muted-foreground">Talk to our academic counsellor for free guidance</p>
         </div>
-        <Button size="lg" className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
-          <Phone className="h-4 w-4" /> Call +91 98765 43210
+        <Button size="lg" variant="cta" className="gap-2" asChild>
+          <a href="tel:+919876543210">
+            <Phone className="h-4 w-4" /> Call +91 98765 43210
+          </a>
         </Button>
       </div>
     </section>

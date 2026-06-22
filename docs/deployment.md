@@ -1,63 +1,79 @@
 # Deployment
 
-## Vercel
+## Vercel + Supabase
 
-1. Import the GitHub repository into Vercel.
-2. Set the framework preset to Next.js.
-3. Use `pnpm install` for install and `pnpm build` for build.
-4. Add environment variables for Production and Preview.
+### 1. GitHub
 
-## Environment Variables
+Push the repo to GitHub. Ensure these are committed:
 
-Required:
+- `public/pathguru-logo.png`
+- `pnpm-lock.yaml` (use pnpm on Vercel)
+- **Do not** commit `.env`
 
-- `DATABASE_URL`: production database connection string. Use PostgreSQL for production.
-- `AUTH_SECRET`: random secret at least 32 characters.
-- `AUTH_URL`: canonical app URL, for example `https://your-domain.com`.
+### 2. Vercel project settings
 
-Local defaults are documented in `.env.example`.
+| Setting | Value |
+| --- | --- |
+| Framework | Next.js |
+| Install Command | `pnpm install` |
+| Build Command | `pnpm build` |
+| Output Directory | `.next` (default) |
 
-## Database Changes
+### 3. Supabase database
 
-Local development:
+1. Open [Supabase Dashboard](https://supabase.com/dashboard) → your project → **Settings → Database**.
+2. Copy two connection strings:
+   - **Transaction pooler** (port `6543`) → `DATABASE_URL`
+   - **Direct** (port `5432`) → `DIRECT_URL`
+3. Add `?pgbouncer=true&connection_limit=1` to the pooled URL if not present.
+4. Push schema and seed (run once from your machine or CI):
 
 ```bash
 pnpm db:push
 pnpm db:seed
 ```
 
-Production recommendation:
+Or use Supabase SQL editor after `prisma db push` generates tables.
 
-1. Use Prisma migrations for production schema changes.
-2. Review generated SQL before applying it to production.
-3. Back up production data before destructive changes.
-4. Apply migrations before or during deployment.
+### 4. Vercel environment variables
 
-This project currently ships with `prisma db push` scripts for development speed. Before a production launch, add migration files and use `prisma migrate deploy` in the release process.
+Set these for **Production** (and Preview if needed):
 
-## Preview Deploys
+| Variable | Description |
+| --- | --- |
+| `DATABASE_URL` | Supabase **pooled** URI (port 6543) |
+| `DIRECT_URL` | Supabase **direct** URI (port 5432) |
+| `AUTH_SECRET` | Random 32+ char secret (`openssl rand -base64 32`) |
+| `AUTH_URL` | Production URL, e.g. `https://your-app.vercel.app` |
+| `RAZORPAY_KEY_ID` | Optional — Razorpay payments |
+| `RAZORPAY_KEY_SECRET` | Optional — Razorpay payments |
 
-Every pull request should create a Vercel Preview Deployment. Use preview deployments to verify:
+### 5. Redeploy
 
-- Login/register flows.
-- Student dashboard and enrollments.
-- Educator batch management.
-- Checkout/cart behavior.
-- Scholarship registration.
-- Mobile layout.
+After env vars are set, trigger a **Redeploy** in Vercel so the build picks them up.
 
-## Post-Deploy Checks
-
-After each production deploy:
+## Local development
 
 ```bash
-pnpm test
+pnpm install
+cp .env.example .env
+# Fill DATABASE_URL + DIRECT_URL from Supabase
+pnpm db:setup
+pnpm dev
 ```
 
-Then smoke test:
+## Post-deploy smoke test
 
-- Visit `/`.
-- Log in with a seeded/test account in the target environment.
-- Open `/dashboard`.
-- Open `/educator` with a faculty/admin account.
-- Submit a scholarship registration.
+- Visit `/` — homepage loads with courses
+- Visit `/exam-categories` — exam list visible
+- Log in with a seeded account
+- Open `/dashboard` and `/test-series`
+
+## Troubleshooting
+
+| Issue | Fix |
+| --- | --- |
+| `Can't reach database server` | Check `DATABASE_URL` uses pooler port 6543 with `pgbouncer=true` |
+| `relation does not exist` | Run `pnpm db:push` and `pnpm db:seed` against Supabase |
+| CSS build error | Ensure `globals.css` has no commas inside `@apply` shadow utilities |
+| Auth redirect loops | Set `AUTH_URL` to exact production domain (no trailing slash) |

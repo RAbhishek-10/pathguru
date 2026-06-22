@@ -27,13 +27,13 @@ export default function ExamCategoriesPage() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-12 lg:px-6">
       <div className="mb-10">
-        <h1 className="mb-3 text-3xl font-bold text-foreground">All Exam Categories</h1>
-        <p className="text-muted-foreground">Choose your target exam and start your preparation journey</p>
+        <h1 className="mb-3 text-3xl font-extrabold tracking-tight text-foreground">All Exam Categories</h1>
+        <p className="text-muted-foreground">Choose your target exam and start your preparation journey with PathGuru</p>
       </div>
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {examCategories.map((cat, i) => (
           <Link key={cat.slug} href={`/exam/${cat.slug}`}>
-            <Card className="group h-full cursor-pointer border-border bg-card py-0 transition-all hover:border-primary/30 hover:shadow-md">
+            <Card className="pg-card group h-full cursor-pointer border-border/60 bg-card py-0">
               <CardContent className="flex flex-col items-center p-8 text-center">
                 <div
                   className={`mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${iconColors[i % iconColors.length]} text-white shadow-sm`}

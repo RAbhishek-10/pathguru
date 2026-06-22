@@ -29,12 +29,12 @@ export default function EducatorLayout({ children }: { children: React.ReactNode
   const [sideOpen, setSideOpen] = useState(false)
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)]">
-      <aside className="hidden w-64 shrink-0 border-r border-border bg-card lg:block">
+    <div className="flex min-h-[calc(100vh-4.25rem)] bg-[#F8FAFC]">
+      <aside className="hidden w-64 shrink-0 border-r border-border/60 bg-white lg:block">
         <div className="flex h-full flex-col">
-          <div className="border-b border-border p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+          <div className="border-b border-border/60 p-5">
+            <div className="flex items-center gap-3 rounded-xl bg-[#EEF5FF] p-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full pg-gradient-primary text-sm font-bold text-white">
                 {user?.name?.charAt(0)}
               </div>
               <div>
@@ -48,8 +48,8 @@ export default function EducatorLayout({ children }: { children: React.ReactNode
               <Link key={item.href} href={item.href}>
                 <Button
                   variant="ghost"
-                  className={`mb-0.5 w-full justify-start gap-3 text-sm ${
-                    pathname === item.href ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"
+                  className={`mb-0.5 w-full justify-start gap-3 rounded-xl text-sm ${
+                    pathname === item.href ? "bg-[#EEF5FF] text-[#0A4DBF]" : "text-muted-foreground hover:bg-[#EEF5FF]/60 hover:text-foreground"
                   }`}
                 >
                   <item.icon className="h-4 w-4" /> {item.label}
@@ -59,7 +59,7 @@ export default function EducatorLayout({ children }: { children: React.ReactNode
           </nav>
           <div className="border-t border-border p-3">
             <Link href="/educator/batches/new">
-              <Button className="mb-2 w-full gap-2 bg-primary text-primary-foreground">
+              <Button className="mb-2 w-full gap-2 rounded-xl">
                 <Plus className="h-4 w-4" /> New Batch
               </Button>
             </Link>
@@ -92,7 +92,7 @@ export default function EducatorLayout({ children }: { children: React.ReactNode
       )}
 
       <div className="flex-1">
-        <div className="flex items-center justify-between border-b border-border bg-card px-4 py-3 lg:px-6">
+        <div className="flex items-center justify-between border-b border-border/60 bg-white px-4 py-3.5 shadow-sm lg:px-6">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" onClick={() => setSideOpen(true)} className="lg:hidden">
               <Menu className="h-5 w-5" />

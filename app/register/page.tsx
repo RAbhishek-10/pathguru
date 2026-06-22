@@ -3,7 +3,8 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { GraduationCap, Eye, EyeOff } from "lucide-react"
+import { Eye, EyeOff } from "lucide-react"
+import BrandLogo from "@/components/brand/BrandLogo"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -33,15 +34,13 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-4 py-12">
-      <Card className="w-full max-w-md border-border bg-card py-0">
+    <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center bg-[#EEF5FF]/50 px-4 py-12">
+      <Card className="w-full max-w-md rounded-2xl border-border/60 bg-card py-0 shadow-[0_8px_40px_rgba(10,77,191,0.1)]">
         <CardContent className="p-8">
-          <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
-              <GraduationCap className="h-6 w-6 text-primary-foreground" />
-            </div>
+          <div className="mb-8 flex flex-col items-center text-center">
+            <BrandLogo size="lg" href={undefined} className="mb-6" />
             <h1 className="text-2xl font-bold text-foreground">Create Account</h1>
-            <p className="mt-1 text-sm text-muted-foreground">Start your exam preparation journey</p>
+            <p className="mt-1 text-sm text-muted-foreground">Start your learning journey with PathGuru</p>
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">

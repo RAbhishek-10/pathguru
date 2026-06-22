@@ -42,7 +42,7 @@ export default function BooksStorePage() {
             <div className="aspect-[3/4] bg-muted/30 p-6">
               <div className="flex h-full items-center justify-center rounded-lg bg-gradient-to-br from-primary/10 to-primary/5">
                 <div className="text-center">
-                  <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary">TrueEducator</p>
+                  <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-[#0A4DBF]">PathGuru</p>
                   <p className="text-sm font-bold text-foreground">{book.title}</p>
                   <p className="mt-1 text-xs text-muted-foreground">{book.author}</p>
                 </div>
