@@ -50,6 +50,11 @@ export async function PATCH(request: Request) {
     const existing = await db.user.findUnique({ where: { id: user!.id } })
     if (!existing) return jsonError("User not found", 404)
 
+    // Google-only accounts have no passwordHash; require current password to set one
+    if (!existing.passwordHash) {
+      return jsonError("Your account uses Google sign-in. Please set a current password first.", 400)
+    }
+
     const valid = await bcrypt.compare(currentPassword!, existing.passwordHash)
     if (!valid) return jsonError("Current password is incorrect", 400)
 
