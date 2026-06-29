@@ -3,7 +3,7 @@
 import React, { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X, Search, ShoppingCart, ChevronDown, BookOpen, LogOut, BarChart3, HelpCircle, Settings, Bell, LayoutDashboard } from "lucide-react"
+import { Menu, X, Search, ShoppingCart, ChevronDown, BookOpen, LogOut, BarChart3, HelpCircle, Settings, Bell, LayoutDashboard, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet"
@@ -134,6 +134,9 @@ export default function Navbar() {
                   {(user?.role === "faculty" || user?.role === "admin") && (
                     <DropdownMenuItem asChild><Link href="/educator" className="flex items-center gap-2"><BookOpen className="h-4 w-4" /> Educator Portal</Link></DropdownMenuItem>
                   )}
+                  {user?.role === "admin" && (
+                    <DropdownMenuItem asChild><Link href="/admin/students" className="flex items-center gap-2"><Users className="h-4 w-4 text-primary" /> Admin Portal</Link></DropdownMenuItem>
+                  )}
                   <DropdownMenuItem asChild><Link href="/analytics" className="flex items-center gap-2"><BarChart3 className="h-4 w-4" /> Analytics</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link href="/doubts" className="flex items-center gap-2"><HelpCircle className="h-4 w-4" /> Doubts</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link href="/settings" className="flex items-center gap-2"><Settings className="h-4 w-4" /> Settings</Link></DropdownMenuItem>
@@ -179,6 +182,12 @@ export default function Navbar() {
                 {isAuthenticated ? (
                   <>
                     <Link href="/dashboard" onClick={() => setMobileOpen(false)}><Button variant="ghost" className="w-full justify-start gap-2 rounded-xl text-sm"><LayoutDashboard className="h-4 w-4" /> Dashboard</Button></Link>
+                    {(user?.role === "faculty" || user?.role === "admin") && (
+                      <Link href="/educator" onClick={() => setMobileOpen(false)}><Button variant="ghost" className="w-full justify-start gap-2 rounded-xl text-sm"><BookOpen className="h-4 w-4" /> Educator Portal</Button></Link>
+                    )}
+                    {user?.role === "admin" && (
+                      <Link href="/admin/students" onClick={() => setMobileOpen(false)}><Button variant="ghost" className="w-full justify-start gap-2 rounded-xl text-sm"><Users className="h-4 w-4 text-primary" /> Admin Portal</Button></Link>
+                    )}
                     <Link href="/analytics" onClick={() => setMobileOpen(false)}><Button variant="ghost" className="w-full justify-start gap-2 rounded-xl text-sm"><BarChart3 className="h-4 w-4" /> Analytics</Button></Link>
                     <Link href="/doubts" onClick={() => setMobileOpen(false)}><Button variant="ghost" className="w-full justify-start gap-2 rounded-xl text-sm"><HelpCircle className="h-4 w-4" /> Doubts</Button></Link>
                     <Button variant="ghost" onClick={() => { logout(); setMobileOpen(false) }} className="w-full justify-start gap-2 rounded-xl text-sm text-destructive"><LogOut className="h-4 w-4" /> Logout</Button>

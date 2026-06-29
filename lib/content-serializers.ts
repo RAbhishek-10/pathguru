@@ -11,6 +11,7 @@ import type {
   Notification,
   Question,
   TestResult,
+  SectionResult,
   Faculty,
 } from "@/lib/types"
 import type {
@@ -83,6 +84,8 @@ export function toQuestion(q: DbQuestion): Question {
     type: q.type as Question["type"],
     stem: q.stem,
     options,
+    correctAnswer: q.correctAnswer,
+    explanation: q.explanation ?? undefined,
     section: q.section,
     marks: q.marks,
     negativeMarks: q.negativeMarks,
@@ -175,17 +178,90 @@ export function toFacultyFromProfile(profile: FacultyProfile & { user: User }): 
   }
 }
 
+type AttemptDetailWithQuestion = {
+  isCorrect: boolean
+  givenAnswer: string | null
+  marksAwarded: number
+  question: {
+    section: string
+    marks: number
+    negativeMarks: number
+  }
+}
+
 export function buildTestResultFromRecord(
   testId: string,
   testName: string,
   score: number,
   totalMarks: number,
   rank: number,
-  percentile: number
+  percentile: number,
+  attemptDetails?: AttemptDetailWithQuestion[],
+  timeTaken?: number
 ): TestResult {
-  const correct = Math.round((score / totalMarks) * 200)
-  const incorrect = Math.round(correct * 0.15)
-  const unattempted = Math.max(0, 200 - correct - incorrect)
+  // --- Build real section data from attempt details ---
+  let sections: SectionResult[] = []
+
+  if (attemptDetails && attemptDetails.length > 0) {
+    // Group by section using actual question data
+    const sectionMap = new Map<string, SectionResult>()
+
+    for (const ad of attemptDetails) {
+      const sec = ad.question.section
+      if (!sectionMap.has(sec)) {
+        sectionMap.set(sec, {
+          name: sec,
+          totalMarks: 0,
+          obtainedMarks: 0,
+          correct: 0,
+          incorrect: 0,
+          unattempted: 0,
+        })
+      }
+      const s = sectionMap.get(sec)!
+      // Contribute to total marks (full marks per question)
+      s.totalMarks += ad.question.marks
+      if (!ad.givenAnswer) {
+        s.unattempted++
+      } else if (ad.isCorrect) {
+        s.correct++
+        s.obtainedMarks += ad.marksAwarded
+      } else {
+        s.incorrect++
+        // marksAwarded is negative for incorrect answers
+        s.obtainedMarks += ad.marksAwarded
+      }
+    }
+    sections = Array.from(sectionMap.values())
+  } else {
+    // Fallback: generic single section when no detail data available
+    sections = [
+      {
+        name: "General",
+        totalMarks,
+        obtainedMarks: score,
+        correct: 0,
+        incorrect: 0,
+        unattempted: 0,
+      },
+    ]
+  }
+
+  const correct = attemptDetails
+    ? attemptDetails.filter((ad) => ad.isCorrect).length
+    : Math.round((score / totalMarks) * 100)
+  const incorrect = attemptDetails
+    ? attemptDetails.filter((ad) => !ad.isCorrect && !!ad.givenAnswer).length
+    : Math.round(correct * 0.15)
+  const unattempted = attemptDetails
+    ? attemptDetails.filter((ad) => !ad.givenAnswer).length
+    : Math.max(0, 100 - correct - incorrect)
+
+  const accuracy =
+    correct + incorrect > 0
+      ? Math.round((correct / (correct + incorrect)) * 1000) / 10
+      : 0
+
   return {
     testId,
     testName,
@@ -194,15 +270,11 @@ export function buildTestResultFromRecord(
     correct,
     incorrect,
     unattempted,
-    accuracy: Math.round((score / totalMarks) * 1000) / 10,
+    accuracy,
     rank,
     totalStudents: 12500,
     percentile,
-    timeTaken: 175,
-    sections: [
-      { name: "Physics", totalMarks: 180, obtainedMarks: Math.round(score * 0.24), correct: 35, incorrect: 7, unattempted: 3 },
-      { name: "Chemistry", totalMarks: 180, obtainedMarks: Math.round(score * 0.27), correct: 40, incorrect: 3, unattempted: 2 },
-      { name: "Biology", totalMarks: 360, obtainedMarks: Math.round(score * 0.49), correct: 70, incorrect: 13, unattempted: 7 },
-    ],
+    timeTaken: timeTaken ?? 0,
+    sections,
   }
 }

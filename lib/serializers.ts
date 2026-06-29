@@ -71,7 +71,8 @@ export function toApiUser(
     purchasedNotes: purchases.filter((p) => p.itemType === "note").map((p) => p.itemId),
     purchasedLectures: purchases.filter((p) => p.itemType === "lecture").map((p) => p.itemId),
     testResults: testResults.map((r) => ({
-      testId: r.testId,
+      resultId: r.id,           // TestResultRecord.id — use this to link to /results/[resultId]
+      testId: r.testId,         // TestSeries.id — for reference only
       testName: r.testName,
       score: r.score,
       totalMarks: r.totalMarks,

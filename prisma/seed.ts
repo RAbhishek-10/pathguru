@@ -256,15 +256,46 @@ async function main() {
   })
 
   const questions = [
-    { type: "mcq", stem: "A body of mass 5 kg is acted upon by two perpendicular forces 8 N and 6 N. The magnitude of acceleration is:", options: JSON.stringify([{ id: "a", text: "2 m/s²" }, { id: "b", text: "4 m/s²" }, { id: "c", text: "6 m/s²" }, { id: "d", text: "10 m/s²" }]), section: "Physics", marks: 4, negativeMarks: 1, sortOrder: 0 },
-    { type: "mcq", stem: "Which of the following is the strongest acid?", options: JSON.stringify([{ id: "a", text: "HF" }, { id: "b", text: "HCl" }, { id: "c", text: "HBr" }, { id: "d", text: "HI" }]), section: "Chemistry", marks: 4, negativeMarks: 1, sortOrder: 1 },
-    { type: "mcq", stem: "The powerhouse of the cell is:", options: JSON.stringify([{ id: "a", text: "Nucleus" }, { id: "b", text: "Mitochondria" }, { id: "c", text: "Ribosome" }, { id: "d", text: "Golgi body" }]), section: "Biology", marks: 4, negativeMarks: 1, sortOrder: 2 },
-    { type: "numerical", stem: "If f(x) = x³ - 3x + 2, find f'(1).", options: "[]", section: "Mathematics", marks: 4, negativeMarks: 0, sortOrder: 3 },
-    { type: "mcq", stem: "The SI unit of electric current is:", options: JSON.stringify([{ id: "a", text: "Volt" }, { id: "b", text: "Ampere" }, { id: "c", text: "Ohm" }, { id: "d", text: "Watt" }]), section: "Physics", marks: 4, negativeMarks: 1, sortOrder: 4 },
+    { type: "mcq", stem: "A body of mass 5 kg is acted upon by two perpendicular forces 8 N and 6 N. The magnitude of acceleration is:", options: JSON.stringify([{ id: "a", text: "2 m/s²" }, { id: "b", text: "4 m/s²" }, { id: "c", text: "6 m/s²" }, { id: "d", text: "10 m/s²" }]), correctAnswer: "a", section: "Physics", marks: 4, negativeMarks: 1, sortOrder: 0 },
+    { type: "mcq", stem: "Which of the following is the strongest acid?", options: JSON.stringify([{ id: "a", text: "HF" }, { id: "b", text: "HCl" }, { id: "c", text: "HBr" }, { id: "d", text: "HI" }]), correctAnswer: "d", section: "Chemistry", marks: 4, negativeMarks: 1, sortOrder: 1 },
+    { type: "mcq", stem: "The powerhouse of the cell is:", options: JSON.stringify([{ id: "a", text: "Nucleus" }, { id: "b", text: "Mitochondria" }, { id: "c", text: "Ribosome" }, { id: "d", text: "Golgi body" }]), correctAnswer: "b", section: "Biology", marks: 4, negativeMarks: 1, sortOrder: 2 },
+    { type: "numerical", stem: "If f(x) = x³ - 3x + 2, find f'(1).", options: "[]", correctAnswer: "0", section: "Mathematics", marks: 4, negativeMarks: 0, sortOrder: 3 },
+    { type: "mcq", stem: "The SI unit of electric current is:", options: JSON.stringify([{ id: "a", text: "Volt" }, { id: "b", text: "Ampere" }, { id: "c", text: "Ohm" }, { id: "d", text: "Watt" }]), correctAnswer: "b", section: "Physics", marks: 4, negativeMarks: 1, sortOrder: 4 },
   ]
 
+  const biologyQuestions = [
+    { type: "mcq", stem: "Which of the following is known as the powerhouse of the cell?", options: JSON.stringify([{ id: "a", text: "Nucleus" }, { id: "b", text: "Mitochondria" }, { id: "c", text: "Endoplasmic Reticulum" }, { id: "d", text: "Lysosome" }]), correctAnswer: "b", section: "Biology", marks: 4, negativeMarks: 1, sortOrder: 0 },
+    { type: "mcq", stem: "Double fertilization is a characteristic feature of:", options: JSON.stringify([{ id: "a", text: "Gymnosperms" }, { id: "b", text: "Angiosperms" }, { id: "c", text: "Pteridophytes" }, { id: "d", text: "Bryophytes" }]), correctAnswer: "b", section: "Biology", marks: 4, negativeMarks: 1, sortOrder: 1 },
+    { type: "mcq", stem: "The term 'systematics' refers to:", options: JSON.stringify([{ id: "a", text: "Identification and study of organ systems" }, { id: "b", text: "Diversity of kinds of organisms and their relationship" }, { id: "c", text: "Taxonomy and nomenclature of plants" }, { id: "d", text: "None of the above" }]), correctAnswer: "b", section: "Biology", marks: 4, negativeMarks: 1, sortOrder: 2 },
+  ]
+
+  const chemistryQuestions = [
+    { type: "mcq", stem: "The most electronegative element in the periodic table is:", options: JSON.stringify([{ id: "a", text: "Fluorine" }, { id: "b", text: "Chlorine" }, { id: "c", text: "Oxygen" }, { id: "d", text: "Nitrogen" }]), correctAnswer: "a", section: "Chemistry", marks: 4, negativeMarks: 1, sortOrder: 0 },
+    { type: "mcq", stem: "The oxidation state of Oxygen in OF2 is:", options: JSON.stringify([{ id: "a", text: "-2" }, { id: "b", text: "+2" }, { id: "c", text: "-1" }, { id: "d", text: "+1" }]), correctAnswer: "b", section: "Chemistry", marks: 4, negativeMarks: 1, sortOrder: 1 },
+  ]
+
+  // Seed questions for all test series
   for (const q of questions) {
     await db.question.create({ data: { testSeriesId: neetTest.id, ...q } })
+  }
+  for (const q of biologyQuestions) {
+    await db.question.create({ data: { testSeriesId: neetTest.id, ...q } })
+  }
+  
+  // Also seed some for the Biology Practice Set
+  const biologyPracticeTest = await db.testSeries.findFirst({ where: { title: "NEET Biology Practice Set" } })
+  if (biologyPracticeTest) {
+    for (const q of biologyQuestions) {
+      await db.question.create({ data: { testSeriesId: biologyPracticeTest.id, ...q } })
+    }
+  }
+
+  // Also seed some for JEE Tests
+  const jeePracticeTest = await db.testSeries.findFirst({ where: { title: "JEE Mains Chapter-wise Tests" } })
+  if (jeePracticeTest) {
+    for (const q of chemistryQuestions) {
+      await db.question.create({ data: { testSeriesId: jeePracticeTest.id, ...q } })
+    }
   }
 
   await db.testResultRecord.createMany({

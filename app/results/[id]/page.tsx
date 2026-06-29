@@ -8,21 +8,34 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import type { TestResult, Question } from "@/lib/types"
+import type { TestResult, Question, SectionResult } from "@/lib/types"
 import { useFetch } from "@/lib/hooks/use-fetch"
 
-export default function ResultsPage({ params }: { params: Promise<{ testId: string }> }) {
-  const { testId } = use(params)
-  const { data } = useFetch<{ latestTestResult: TestResult | null }>("/api/analytics")
-  const { data: testData } = useFetch<{ questions: Question[] }>(`/api/tests/${testId}`)
-  const result = data?.latestTestResult
+export default function ResultsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
+  const { data: resData } = useFetch<{ formatted: TestResult; record: any }>(`/api/results/${id}`)
+  const result: TestResult | undefined = resData?.formatted
+  const record = resData?.record
 
   if (!result) {
     return <p className="p-12 text-center text-muted-foreground">Loading results...</p>
   }
 
-  const questions = testData?.questions ?? []
+  const attemptDetails = record?.attemptDetails || []
+  // Questions pulled from real attemptDetails (with question data included)
+  const questions = attemptDetails.map((ad: any) => ad.question) || []
   const scorePercent = (result.obtainedMarks / result.totalMarks) * 100
+
+  // Real completion date from DB record (not hardcoded today)
+  const completedAtDisplay = record?.completedAt
+    ? new Date(record.completedAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
+    : new Date().toLocaleDateString("en-IN")
+
+  // Format time taken from minutes
+  const timeTakenMins = result.timeTaken ?? 0
+  const timeTakenDisplay = timeTakenMins >= 60
+    ? `${Math.floor(timeTakenMins / 60)}h ${timeTakenMins % 60}m`
+    : `${timeTakenMins}m`
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 lg:px-6">
@@ -32,11 +45,11 @@ export default function ResultsPage({ params }: { params: Promise<{ testId: stri
             <ArrowLeft className="h-4 w-4" /> Back to Test Series
           </Link>
           <h1 className="text-2xl font-bold text-foreground">{result.testName}</h1>
-          <p className="text-sm text-muted-foreground">Completed on {new Date().toLocaleDateString("en-IN")}</p>
+          <p className="text-sm text-muted-foreground">Completed on {completedAtDisplay}</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="gap-1"><Download className="h-4 w-4" /> Download PDF</Button>
-          <Button variant="outline" size="sm" className="gap-1"><Share2 className="h-4 w-4" /> Share</Button>
+          <Button variant="outline" size="sm" className="gap-1" onClick={() => window.print()}><Download className="h-4 w-4" /> Download PDF</Button>
+          <Button variant="outline" size="sm" className="gap-1" onClick={() => { navigator.clipboard.writeText(window.location.href); }}><Share2 className="h-4 w-4" /> Copy Link</Button>
         </div>
       </div>
 
@@ -77,7 +90,7 @@ export default function ResultsPage({ params }: { params: Promise<{ testId: stri
                 </div>
                 <div className="rounded-lg bg-muted/50 p-3 text-center">
                   <Clock className="mx-auto mb-1 h-5 w-5 text-chart-4" />
-                  <p className="text-xl font-bold text-foreground">{result.timeTaken}m</p>
+                  <p className="text-xl font-bold text-foreground">{timeTakenDisplay}</p>
                   <p className="text-xs text-muted-foreground">Time Taken</p>
                 </div>
               </div>
@@ -152,7 +165,18 @@ export default function ResultsPage({ params }: { params: Promise<{ testId: stri
         {/* Solutions */}
         <TabsContent value="solutions">
           <div className="flex flex-col gap-4">
-            {questions.map((q, i) => (
+            {questions.map((q: any, i: number) => {
+              const attempt = attemptDetails.find((ad: any) => ad.questionId === q.id)
+              const status = attempt?.isCorrect ? "Correct" : attempt?.givenAnswer ? "Incorrect" : "Skipped"
+              
+              let options: any[] = []
+              try {
+                if (q.options) {
+                  options = typeof q.options === 'string' ? JSON.parse(q.options) : q.options
+                }
+              } catch (e) {}
+
+              return (
               <Card key={q.id} className="border-border bg-card">
                 <CardContent className="p-5">
                   <div className="mb-3 flex items-center justify-between">
@@ -160,29 +184,43 @@ export default function ResultsPage({ params }: { params: Promise<{ testId: stri
                       <Badge variant="outline" className="text-xs">Q{i + 1}</Badge>
                       <Badge variant="secondary" className="text-xs">{q.section}</Badge>
                     </div>
-                    {i % 3 === 0 ? (
+                    {status === "Correct" ? (
                       <Badge className="bg-success/10 text-success text-xs">Correct</Badge>
-                    ) : i % 3 === 1 ? (
+                    ) : status === "Incorrect" ? (
                       <Badge className="bg-destructive/10 text-destructive text-xs">Incorrect</Badge>
                     ) : (
                       <Badge className="bg-muted text-muted-foreground text-xs">Skipped</Badge>
                     )}
                   </div>
                   <p className="mb-3 text-sm text-foreground">{q.stem}</p>
-                  {q.options && (
+                  {options.length > 0 ? (
                     <div className="flex flex-col gap-2">
-                      {q.options.map((opt, oi) => (
-                        <div key={opt.id} className={`rounded-lg border px-3 py-2 text-sm ${oi === 1 ? "border-success bg-success/5 text-foreground" : "border-border text-muted-foreground"}`}>
+                      {options.map((opt, oi) => {
+                        const isCorrectOption = opt.id === q.correctAnswer
+                        const isGivenOption = opt.id === attempt?.givenAnswer
+                        let classes = "border-border text-muted-foreground"
+                        if (isCorrectOption) classes = "border-success bg-success/5 text-foreground"
+                        else if (isGivenOption) classes = "border-destructive bg-destructive/5 text-foreground"
+
+                        return (
+                        <div key={opt.id} className={`rounded-lg border px-3 py-2 text-sm ${classes}`}>
                           <span className="mr-2 font-semibold">{String.fromCharCode(65 + oi)}.</span>
                           {opt.text}
-                          {oi === 1 && <CheckCircle2 className="ml-2 inline h-4 w-4 text-success" />}
+                          {isCorrectOption && <CheckCircle2 className="ml-2 inline h-4 w-4 text-success" />}
+                          {isGivenOption && !isCorrectOption && <XCircle className="ml-2 inline h-4 w-4 text-destructive" />}
                         </div>
-                      ))}
+                        )
+                      })}
+                    </div>
+                  ) : (
+                    <div className="mt-2 text-sm">
+                      <p><strong>Correct Answer:</strong> {q.correctAnswer}</p>
+                      <p><strong>Your Answer:</strong> {attempt?.givenAnswer || "Not answered"}</p>
                     </div>
                   )}
                 </CardContent>
               </Card>
-            ))}
+            )})}
           </div>
         </TabsContent>
 

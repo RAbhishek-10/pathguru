@@ -189,11 +189,15 @@ model Question {
   type          String
   stem          String
   options       String     @default("[]")
+  correctAnswer String     @default("")
+  explanation   String?
   section       String
   marks         Int
   negativeMarks Int
   imageUrl      String?
   sortOrder     Int        @default(0)
+
+  attemptDetails TestAttemptDetail[]
 }
 
 model LiveClass {
@@ -320,14 +324,33 @@ model Purchase {
 }
 
 model TestResultRecord {
-  id          String   @id @default(cuid())
-  userId      String
-  testId      String
-  testName    String
-  score       Float
-  totalMarks  Float
-  rank        Int
-  percentile  Float
-  completedAt DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  userId       String
+  testId       String
+  testName     String
+  score        Float
+  totalMarks   Float
+  correct      Int      @default(0)
+  incorrect    Int      @default(0)
+  unattempted  Int      @default(0)
+  timeTaken    Int      @default(0)
+  rank         Int
+  percentile   Float
+  completedAt  DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  attemptDetails TestAttemptDetail[]
+}
+
+model TestAttemptDetail {
+  id               String           @id @default(cuid())
+  testResultId     String
+  testResult       TestResultRecord @relation(fields: [testResultId], references: [id], onDelete: Cascade)
+  questionId       String
+  question         Question         @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  givenAnswer      String?
+  isCorrect        Boolean          @default(false)
+  marksAwarded     Float            @default(0)
+
+  @@unique([testResultId, questionId])
 }

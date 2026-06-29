@@ -125,17 +125,79 @@ export const testimonials: Testimonial[] = [
 export const lectures: Lecture[] = [
   { id: "l1", title: "Introduction to Mechanics", duration: "45:00", thumbnail: "/placeholder.svg?height=120&width=200", isFree: true, isCompleted: true, subject: "Physics" },
   { id: "l2", title: "Newton's Laws of Motion", duration: "1:12:00", thumbnail: "/placeholder.svg?height=120&width=200", isFree: false, isCompleted: true, subject: "Physics" },
-  { id: "l3", title: "Work, Energy & Power", duration: "58:00", thumbnail: "/placeholder.svg?height=120&width=200", isFree: false, isCompleted: false, subject: "Physics" },
-  { id: "l4", title: "Chemical Bonding", duration: "1:05:00", thumbnail: "/placeholder.svg?height=120&width=200", isFree: true, isCompleted: false, subject: "Chemistry" },
   { id: "l5", title: "Periodic Table Trends", duration: "52:00", thumbnail: "/placeholder.svg?height=120&width=200", isFree: false, isCompleted: false, subject: "Chemistry" },
 ]
 
 export const sampleQuestions: Question[] = [
-  { id: "q1", type: "mcq", stem: "A body of mass 5 kg is acted upon by two perpendicular forces 8 N and 6 N. The magnitude of acceleration is:", options: [{ id: "a", text: "2 m/s\u00B2" }, { id: "b", text: "4 m/s\u00B2" }, { id: "c", text: "6 m/s\u00B2" }, { id: "d", text: "10 m/s\u00B2" }], section: "Physics", marks: 4, negativeMarks: 1 },
-  { id: "q2", type: "mcq", stem: "Which of the following is the strongest acid?", options: [{ id: "a", text: "HF" }, { id: "b", text: "HCl" }, { id: "c", text: "HBr" }, { id: "d", text: "HI" }], section: "Chemistry", marks: 4, negativeMarks: 1 },
-  { id: "q3", type: "mcq", stem: "The powerhouse of the cell is:", options: [{ id: "a", text: "Nucleus" }, { id: "b", text: "Mitochondria" }, { id: "c", text: "Ribosome" }, { id: "d", text: "Golgi body" }], section: "Biology", marks: 4, negativeMarks: 1 },
-  { id: "q4", type: "numerical", stem: "If f(x) = x\u00B3 - 3x + 2, find f'(1).", section: "Mathematics", marks: 4, negativeMarks: 0 },
-  { id: "q5", type: "mcq", stem: "The SI unit of electric current is:", options: [{ id: "a", text: "Volt" }, { id: "b", text: "Ampere" }, { id: "c", text: "Ohm" }, { id: "d", text: "Watt" }], section: "Physics", marks: 4, negativeMarks: 1 },
+  {
+    id: "q_physics_1",
+    type: "mcq",
+    stem: "A body of mass 5 kg is acted upon by two perpendicular forces 8 N and 6 N. The magnitude of acceleration is:",
+    options: [
+      { id: "a", text: "2 m/s²" },
+      { id: "b", text: "4 m/s²" },
+      { id: "c", text: "6 m/s²" },
+      { id: "d", text: "10 m/s²" },
+    ],
+    correctAnswer: "a",
+    section: "Physics",
+    marks: 4,
+    negativeMarks: 1,
+  },
+  {
+    id: "q_chem_1",
+    type: "mcq",
+    stem: "Which of the following is the strongest acid?",
+    options: [
+      { id: "a", text: "HF" },
+      { id: "b", text: "HCl" },
+      { id: "c", text: "HBr" },
+      { id: "d", text: "HI" },
+    ],
+    correctAnswer: "d",
+    section: "Chemistry",
+    marks: 4,
+    negativeMarks: 1,
+  },
+  {
+    id: "q_bio_1",
+    type: "mcq",
+    stem: "The powerhouse of the cell is:",
+    options: [
+      { id: "a", text: "Nucleus" },
+      { id: "b", text: "Mitochondria" },
+      { id: "c", text: "Ribosome" },
+      { id: "d", text: "Golgi body" },
+    ],
+    correctAnswer: "b",
+    section: "Biology",
+    marks: 4,
+    negativeMarks: 1,
+  },
+  {
+    id: "q_math_1",
+    type: "numerical",
+    stem: "If f(x) = x³ - 3x + 2, find f'(1).",
+    correctAnswer: "0",
+    section: "Mathematics",
+    marks: 4,
+    negativeMarks: 0,
+  },
+  {
+    id: "q_physics_2",
+    type: "mcq",
+    stem: "The SI unit of electric current is:",
+    options: [
+      { id: "a", text: "Volt" },
+      { id: "b", text: "Ampere" },
+      { id: "c", text: "Ohm" },
+      { id: "d", text: "Watt" },
+    ],
+    correctAnswer: "b",
+    section: "Physics",
+    marks: 4,
+    negativeMarks: 1,
+  },
 ]
 
 export const sampleTestResult: TestResult = {
@@ -173,8 +235,8 @@ export const mockUser: ApiUser = {
   purchasedNotes: ["n1", "n3"],
   purchasedLectures: [],
   testResults: [
-    { testId: "t1", testName: "NEET Mock 1", score: 542, totalMarks: 720, rank: 234, percentile: 98.1, date: "2025-06-25" },
-    { testId: "t2", testName: "JEE Mock 1", score: 198, totalMarks: 300, rank: 156, percentile: 95.2, date: "2025-06-20" },
+    { resultId: "mock_res_1", testId: "t1", testName: "NEET Mock 1", score: 542, totalMarks: 720, rank: 234, percentile: 98.1, date: "2025-06-25" },
+    { resultId: "mock_res_2", testId: "t2", testName: "JEE Mock 1", score: 198, totalMarks: 300, rank: 156, percentile: 95.2, date: "2025-06-20" },
   ],
   walletBalance: 1500,
   referralCode: "RAHUL2025",

@@ -17,7 +17,8 @@ export interface ApiUser {
 }
 
 export interface TestResultSummary {
-  testId: string
+  resultId: string  // TestResultRecord.id — use to link to /results/[resultId]
+  testId: string    // TestSeries.id — for reference
   testName: string
   score: number
   totalMarks: number
@@ -116,6 +117,8 @@ export interface Question {
   type: "mcq" | "mmcq" | "numerical"
   stem: string
   options?: { id: string; text: string }[]
+  correctAnswer?: string
+  explanation?: string
   section: string
   marks: number
   negativeMarks: number

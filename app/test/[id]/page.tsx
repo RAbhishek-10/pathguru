@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback, use } from "react"
+import { useState, useEffect, useCallback, use, useRef } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Clock, ChevronLeft, ChevronRight, Flag, Eye, Send, AlertTriangle, Menu, X } from "lucide-react"
@@ -39,6 +39,47 @@ export default function TestEnginePage({ params }: { params: Promise<{ id: strin
   const [timeLeft, setTimeLeft] = useState(60 * 60)
   const [showSubmitDialog, setShowSubmitDialog] = useState(false)
   const [showPalette, setShowPalette] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // ---- FIX: use refs to avoid stale closure in timer ----
+  const answersRef = useRef<Record<string, string>>({})
+  const testRef = useRef<TestSeries | null>(null)
+  const startTimeRef = useRef<number>(Date.now())
+
+  // Keep refs in sync with state
+  useEffect(() => {
+    answersRef.current = answers
+  }, [answers])
+
+  useEffect(() => {
+    testRef.current = test
+    if (test) {
+      startTimeRef.current = Date.now()
+    }
+  }, [test])
+
+  const handleSubmit = useCallback(async (autoSubmit = false) => {
+    const currentTest = testRef.current
+    const currentAnswers = autoSubmit ? answersRef.current : answers
+    if (!currentTest) return
+    setIsSubmitting(true)
+    try {
+      const timeTakenSeconds = Math.floor((Date.now() - startTimeRef.current) / 1000)
+      const res = await fetch(`/api/tests/${currentTest.id}/submit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answers: currentAnswers, timeTaken: timeTakenSeconds }),
+      })
+      if (!res.ok) throw new Error("Failed to submit")
+      const data = await res.json()
+      router.push(`/results/${data.resultId}`)
+    } catch (e) {
+      console.error(e)
+      alert("Submission failed. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }, [answers, router])
 
   useEffect(() => {
     if (questions.length > 0) {
@@ -54,20 +95,36 @@ export default function TestEnginePage({ params }: { params: Promise<{ id: strin
     if (test) setTimeLeft(test.duration * 60)
   }, [test])
 
+  // ---- FIX: timer uses ref-based handleSubmit to avoid stale closures ----
   useEffect(() => {
     if (!test) return
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer)
-          router.push(`/results/${test.id}`)
+          // Use refs directly so no stale closure
+          const currentTest = testRef.current
+          const currentAnswers = answersRef.current
+          if (currentTest) {
+            const timeTakenSeconds = Math.floor((Date.now() - startTimeRef.current) / 1000)
+            fetch(`/api/tests/${currentTest.id}/submit`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ answers: currentAnswers, timeTaken: timeTakenSeconds }),
+            })
+              .then((r) => (r.ok ? r.json() : null))
+              .then((data) => {
+                if (data?.resultId) router.push(`/results/${data.resultId}`)
+              })
+              .catch(console.error)
+          }
           return 0
         }
         return prev - 1
       })
     }, 1000)
     return () => clearInterval(timer)
-  }, [router, test])
+  }, [test, router])
 
   // Get dynamic status of a question (NTA style)
   const getQStatus = useCallback((qId: string): QStatus => {
@@ -87,7 +144,7 @@ export default function TestEnginePage({ params }: { params: Promise<{ id: strin
     setStatuses((prev) => {
       // Keep it marked if it was marked
       if (prev[qId] === "marked") return prev
-      return { ...prev, [qId]: "visited" } // Mark as visited/answered
+      return { ...prev, [qId]: "visited" }
     })
   }, [])
 
@@ -114,7 +171,6 @@ export default function TestEnginePage({ params }: { params: Promise<{ id: strin
 
   const goToQ = useCallback((i: number) => {
     const qId = questions[i].id
-    // If it's unanswered, visiting it turns its state to "visited" (Not Answered)
     setStatuses((prev) => {
       if (prev[qId] === "unanswered") {
         return { ...prev, [qId]: "visited" }
@@ -157,8 +213,25 @@ export default function TestEnginePage({ params }: { params: Promise<{ id: strin
     }
   }
 
-  if (!test || questions.length === 0) {
-    return <p className="p-12 text-center text-muted-foreground">Loading test...</p>
+  if (!test) {
+    return <p className="p-12 text-center text-muted-foreground animate-pulse">Loading test details...</p>
+  }
+
+  if (questions.length === 0) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background p-6 text-center">
+        <div className="max-w-md space-y-4 rounded-xl border border-border bg-card p-8 shadow-sm">
+          <AlertTriangle className="mx-auto h-12 w-12 text-warning" />
+          <h2 className="text-xl font-bold text-foreground">No Questions Found</h2>
+          <p className="text-sm text-muted-foreground">
+            This test series does not contain any questions yet. Please contact support or administrator to set up the questions.
+          </p>
+          <Link href="/test-series" className="block">
+            <Button className="w-full bg-primary text-primary-foreground">Back to Test Series</Button>
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   const hours = Math.floor(timeLeft / 3600)
@@ -362,9 +435,9 @@ export default function TestEnginePage({ params }: { params: Promise<{ id: strin
             </div>
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setShowSubmitDialog(false)}>Continue Test</Button>
-            <Button className="bg-primary text-primary-foreground" onClick={() => router.push(`/results/${test.id}`)}>
-              Submit Now
+            <Button variant="outline" onClick={() => setShowSubmitDialog(false)} disabled={isSubmitting}>Continue Test</Button>
+            <Button className="bg-primary text-primary-foreground" onClick={() => handleSubmit(false)} disabled={isSubmitting}>
+              {isSubmitting ? "Submitting..." : "Submit Now"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -372,4 +445,3 @@ export default function TestEnginePage({ params }: { params: Promise<{ id: strin
     </div>
   )
 }
-
