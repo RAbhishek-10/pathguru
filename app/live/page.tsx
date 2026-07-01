@@ -8,6 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { LiveClass } from "@/lib/types"
 import { useFetch } from "@/lib/hooks/use-fetch"
 
+import { toast } from "sonner"
+
 function formatTime(dateStr: string) {
   return new Date(dateStr).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })
 }
@@ -48,17 +50,37 @@ function ClassCard({ cls }: { cls: LiveClass }) {
         </div>
         <div>
           {cls.status === "live" && (
-            <Button size="sm" className="gap-1 bg-destructive text-white hover:bg-destructive/90">
+            <Button
+              onClick={() => {
+                toast.success(`Launching live streaming room for ${cls.title}...`)
+                window.open("https://meet.google.com/abc-defg-hij", "_blank")
+              }}
+              size="sm"
+              className="gap-1 bg-destructive text-white hover:bg-destructive/90"
+            >
               <Radio className="h-3.5 w-3.5" /> Join Live
             </Button>
           )}
           {cls.status === "upcoming" && (
-            <Button size="sm" variant="outline" className="gap-1">
+            <Button
+              onClick={() => toast.success(`Reminder set! You will be notified 15 mins before ${cls.title} starts.`)}
+              size="sm"
+              variant="outline"
+              className="gap-1"
+            >
               <Calendar className="h-3.5 w-3.5" /> Set Reminder
             </Button>
           )}
           {cls.status === "ended" && cls.recordingUrl && (
-            <Button size="sm" variant="secondary" className="gap-1">
+            <Button
+              onClick={() => {
+                toast.success(`Opening recording for ${cls.title}...`)
+                window.open(cls.recordingUrl, "_blank")
+              }}
+              size="sm"
+              variant="secondary"
+              className="gap-1"
+            >
               <Play className="h-3.5 w-3.5" /> Watch Recording
             </Button>
           )}

@@ -30,7 +30,7 @@ function HeroSection() {
       <div className="pointer-events-none absolute bottom-0 left-1/2 h-64 w-[600px] -translate-x-1/2 rounded-full bg-[#0A4DBF]/5 blur-3xl" />
 
       <div className="relative mx-auto flex max-w-7xl flex-col items-center gap-8 px-4 py-20 text-center lg:py-28 lg:px-6">
-        <Badge variant="secondary" className="animate-fade-in gap-1.5 rounded-full border border-[#0A4DBF]/20 bg-white px-4 py-1.5 text-[#0A4DBF] shadow-sm">
+        <Badge variant="secondary" className="animate-fade-in gap-1.5 rounded-full border border-[#0A4DBF]/20 bg-white dark:bg-card px-4 py-1.5 text-[#0A4DBF] dark:text-primary shadow-sm">
           <Sparkles className="h-3.5 w-3.5 text-[#FF7A1A]" /> The Future of Learning
         </Badge>
         <h1 className="animate-fade-in-up max-w-4xl text-balance text-4xl font-extrabold leading-[1.1] tracking-tight text-foreground md:text-5xl lg:text-6xl">
@@ -58,7 +58,7 @@ function HeroSection() {
             { value: "15+", label: "Centres", color: "text-[#0A4DBF]" },
             { value: "95%", label: "Satisfaction", color: "text-[#FF7A1A]" },
           ].map((stat) => (
-            <div key={stat.label} className="rounded-2xl border border-border/50 bg-white/80 px-4 py-4 shadow-sm backdrop-blur-sm">
+            <div key={stat.label} className="rounded-2xl border border-border/50 bg-white/80 dark:bg-card/80 px-4 py-4 shadow-sm backdrop-blur-sm">
               <p className={`text-xl font-extrabold md:text-2xl ${stat.color}`}>{stat.value}</p>
               <p className="mt-0.5 text-xs font-medium text-muted-foreground">{stat.label}</p>
             </div>
@@ -72,7 +72,7 @@ function HeroSection() {
 /* ─── Announcement Ticker ─── */
 function AnnouncementTicker() {
   return (
-    <div className="overflow-hidden border-y border-[#0A4DBF]/10 bg-[#EEF5FF]">
+    <div className="overflow-hidden border-y border-[#0A4DBF]/10 dark:border-border bg-[#EEF5FF] dark:bg-muted/50">
       <div className="animate-marquee flex whitespace-nowrap py-3">
         {[
           "NEET 2026 Arjuna Batch Now Open - Limited Seats!",
@@ -81,7 +81,7 @@ function AnnouncementTicker() {
           "New: AI Doubt Resolution - Get Answers in Seconds",
           "GATE CSE Prayas Batch Starting Aug 2025",
         ].map((text, i) => (
-          <span key={i} className="mx-8 inline-flex items-center gap-2 text-sm font-semibold text-[#0A4DBF]">
+          <span key={i} className="mx-8 inline-flex items-center gap-2 text-sm font-semibold text-[#0A4DBF] dark:text-primary">
             <span className="h-1.5 w-1.5 rounded-full bg-[#FF7A1A]" />
             {text}
           </span>
@@ -262,7 +262,7 @@ function WhyChooseUs() {
           {features.map((f) => (
             <Card key={f.title} className="pg-card border-border/60 bg-card py-0">
               <CardContent className="flex items-start gap-4 p-5">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#EEF5FF] text-[#0A4DBF]">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#EEF5FF] dark:bg-muted text-[#0A4DBF] dark:text-primary">
                   <f.icon className="h-5 w-5" />
                 </div>
                 <div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { BookOpen, ClipboardList, Trophy, Flame, Play, ArrowRight, BarChart3, Calendar, Clock, Award, Wallet, Copy } from "lucide-react"
+import { BookOpen, ClipboardList, Trophy, Flame, Play, ArrowRight, BarChart3, Calendar, Clock, Award, Wallet, Copy, Share2 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -335,6 +335,20 @@ export default function DashboardPage() {
                   <code className="rounded-lg bg-muted px-3 py-2 text-sm font-mono font-semibold text-foreground">{user?.referralCode}</code>
                   <Button variant="outline" size="icon" onClick={() => { navigator.clipboard.writeText(user?.referralCode ?? ""); toast.success("Copied!") }}>
                     <Copy className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="icon" onClick={() => {
+                    if (typeof navigator !== "undefined" && navigator.share) {
+                      navigator.share({
+                        title: "PathGuru Referral",
+                        text: `Join PathGuru with my referral code ${user?.referralCode} and get study credits!`,
+                        url: window.location.origin
+                      }).catch(() => {})
+                    } else {
+                      navigator.clipboard.writeText(user?.referralCode || "")
+                      toast.success("Referral code copied to clipboard!")
+                    }
+                  }}>
+                    <Share2 className="h-4 w-4" />
                   </Button>
                 </div>
               </CardContent>

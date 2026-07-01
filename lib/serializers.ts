@@ -40,7 +40,7 @@ export function toBatch(batch: BatchWithRelations): Batch {
   }
 }
 
-export function toLecture(lecture: DbLecture, completed = false): Lecture {
+export function toLecture(lecture: DbLecture, completed = false, exposeVideo = false): Lecture {
   return {
     id: lecture.id,
     title: lecture.title,
@@ -49,6 +49,7 @@ export function toLecture(lecture: DbLecture, completed = false): Lecture {
     isFree: lecture.isFree,
     isCompleted: completed,
     subject: lecture.subject,
+    videoUrl: (exposeVideo || lecture.isFree) ? (lecture.videoUrl ?? undefined) : undefined,
   }
 }
 

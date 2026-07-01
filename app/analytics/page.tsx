@@ -112,8 +112,8 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col gap-5">
-              {subjectProgress.map((sub) => (
-                <div key={sub.name}>
+              {subjectProgress.map((sub, i) => (
+                <div key={`${sub.name}-${i}`}>
                   <div className="mb-1.5 flex items-center justify-between">
                     <span className="text-sm font-medium text-foreground">{sub.name}</span>
                     <div className="flex items-center gap-2">

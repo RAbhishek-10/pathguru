@@ -11,16 +11,33 @@ import { Progress } from "@/components/ui/progress"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { useAuth } from "@/contexts/AuthContext"
 import { useCart } from "@/contexts/CartContext"
+import { useRouter } from "next/navigation"
 import type { Note, TestSeries } from "@/lib/types"
 import type { Batch, Lecture } from "@/lib/types"
 import { toast } from "sonner"
 
 export default function BatchDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
+  const router = useRouter()
   const { user, refreshUser } = useAuth()
   const { addItem } = useCart()
   const [batch, setBatch] = useState<(Batch & { lectures?: Lecture[] }) | null>(null)
   const [loading, setLoading] = useState(true)
+  const [wishlisted, setWishlisted] = useState(false)
+  const [ratingInput, setRatingInput] = useState(5)
+  const [reviewText, setReviewText] = useState("")
+  const [reviewsList, setReviewsList] = useState([
+    { name: "Ankit Kumar", rating: 5, text: "Excellent batch! The faculty explains concepts so clearly. Test series is very close to actual exam pattern.", date: "2 weeks ago" },
+    { name: "Priya Singh", rating: 4, text: "Good study material and regular tests. Could improve the DPP difficulty level a bit.", date: "1 month ago" },
+    { name: "Rahul Verma", rating: 5, text: "AI doubt resolution is a game changer. No more waiting for hours to get your doubts cleared.", date: "1 month ago" },
+  ])
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const list = localStorage.getItem("wishlist") ? JSON.parse(localStorage.getItem("wishlist")!) : []
+      setWishlisted(list.includes(id))
+    }
+  }, [id])
 
   useEffect(() => {
     fetch(`/api/batches/${id}`)
@@ -60,10 +77,56 @@ export default function BatchDetailPage({ params }: { params: Promise<{ id: stri
     if (res.ok) {
       toast.success("Enrolled successfully!")
       await refreshUser()
+      router.push(`/batch/${id}/learn`)
     } else {
       const err = await res.json()
       toast.error(err.error ?? "Enrollment failed")
     }
+  }
+
+  const handleWishlist = () => {
+    if (typeof window !== "undefined") {
+      const list = localStorage.getItem("wishlist") ? JSON.parse(localStorage.getItem("wishlist")!) : []
+      if (list.includes(id)) {
+        const updated = list.filter((x: string) => x !== id)
+        localStorage.setItem("wishlist", JSON.stringify(updated))
+        setWishlisted(false)
+        toast.success("Removed from wishlist")
+      } else {
+        list.push(id)
+        localStorage.setItem("wishlist", JSON.stringify(list))
+        setWishlisted(true)
+        toast.success("Added to wishlist")
+      }
+    }
+  }
+
+  const handleShare = () => {
+    if (typeof navigator !== "undefined" && navigator.share) {
+      navigator.share({
+        title: batch?.title || "Batch on PathGuru",
+        url: window.location.href
+      }).catch(() => {})
+    } else {
+      navigator.clipboard.writeText(window.location.href)
+      toast.success("URL copied to clipboard!")
+    }
+  }
+
+  const handleReviewSubmit = () => {
+    if (!reviewText.trim()) {
+      toast.error("Please enter a review message")
+      return
+    }
+    const newReview = {
+      name: user?.name || "Anonymous Student",
+      rating: ratingInput,
+      text: reviewText,
+      date: "Just now"
+    }
+    setReviewsList([newReview, ...reviewsList])
+    setReviewText("")
+    toast.success("Thank you for your review!")
   }
 
   if (loading) return <div className="p-12 text-center text-muted-foreground">Loading batch...</div>
@@ -132,9 +195,13 @@ export default function BatchDetailPage({ params }: { params: Promise<{ id: stri
                   </div>
                 )}
 
-                <div className="mt-4 flex gap-2">
-                  <Button variant="ghost" size="sm" className="flex-1 gap-1 text-muted-foreground"><Heart className="h-4 w-4" /> Wishlist</Button>
-                  <Button variant="ghost" size="sm" className="flex-1 gap-1 text-muted-foreground"><Share2 className="h-4 w-4" /> Share</Button>
+                 <div className="mt-4 flex gap-2">
+                  <Button onClick={handleWishlist} variant="ghost" size="sm" className="flex-1 gap-1 text-muted-foreground">
+                    <Heart className={`h-4 w-4 ${wishlisted ? "fill-red-500 text-red-500" : ""}`} /> Wishlist
+                  </Button>
+                  <Button onClick={handleShare} variant="ghost" size="sm" className="flex-1 gap-1 text-muted-foreground">
+                    <Share2 className="h-4 w-4" /> Share
+                  </Button>
                 </div>
 
                 <div className="mt-5 border-t border-border pt-5">
@@ -284,19 +351,29 @@ export default function BatchDetailPage({ params }: { params: Promise<{ id: stri
                     <h4 className="mb-3 text-sm font-semibold text-foreground">Write a Review</h4>
                     <div className="mb-3 flex gap-1">
                       {[1, 2, 3, 4, 5].map((s) => (
-                        <Star key={s} className="h-6 w-6 cursor-pointer text-muted hover:text-amber-400" />
+                        <Star
+                          key={s}
+                          onClick={() => setRatingInput(s)}
+                          className={`h-6 w-6 cursor-pointer transition-colors ${
+                            s <= ratingInput ? "fill-amber-400 text-amber-400" : "text-muted"
+                          }`}
+                        />
                       ))}
                     </div>
-                    <textarea className="w-full rounded-lg border border-input bg-background p-3 text-sm" rows={3} placeholder="Share your experience..." />
-                    <Button size="sm" className="mt-3 bg-primary text-primary-foreground">Submit Review</Button>
+                    <textarea
+                      value={reviewText}
+                      onChange={(e) => setReviewText(e.target.value)}
+                      className="w-full rounded-lg border border-input bg-background p-3 text-sm text-foreground"
+                      rows={3}
+                      placeholder="Share your experience..."
+                    />
+                    <Button onClick={handleReviewSubmit} size="sm" className="mt-3 bg-primary text-primary-foreground">
+                      Submit Review
+                    </Button>
                   </CardContent>
                 </Card>
               )}
-              {[
-                { name: "Ankit Kumar", rating: 5, text: "Excellent batch! The faculty explains concepts so clearly. Test series is very close to actual exam pattern.", date: "2 weeks ago" },
-                { name: "Priya Singh", rating: 4, text: "Good study material and regular tests. Could improve the DPP difficulty level a bit.", date: "1 month ago" },
-                { name: "Rahul Verma", rating: 5, text: "AI doubt resolution is a game changer. No more waiting for hours to get your doubts cleared.", date: "1 month ago" },
-              ].map((r, i) => (
+              {reviewsList.map((r, i) => (
                 <Card key={i} className="border-border bg-card py-0">
                   <CardContent className="p-5">
                     <div className="mb-2 flex items-center gap-3">

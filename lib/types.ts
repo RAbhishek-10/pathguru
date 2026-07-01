@@ -83,6 +83,7 @@ export interface Lecture {
   isFree: boolean
   isCompleted: boolean
   subject: string
+  videoUrl?: string
 }
 
 export interface Note {

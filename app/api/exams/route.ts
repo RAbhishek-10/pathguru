@@ -12,8 +12,24 @@ export async function GET() {
     ])
 
     const countMap = Object.fromEntries(batchCounts.map((b) => [b.examSlug, b._count.id]))
-    return categories.map((c) => toExamCategory(c, countMap[c.slug] ?? 0))
-  }, mockExamCategories)
+    const list = categories.map((c) => toExamCategory(c, countMap[c.slug] ?? 0))
+
+    const seen = new Set<string>()
+    return list.filter((item) => {
+      const lower = item.slug.toLowerCase()
+      if (seen.has(lower)) return false
+      seen.add(lower)
+      return true
+    })
+  }, () => {
+    const seen = new Set<string>()
+    return mockExamCategories.filter((item) => {
+      const lower = item.slug.toLowerCase()
+      if (seen.has(lower)) return false
+      seen.add(lower)
+      return true
+    })
+  })
 
   return NextResponse.json(categories)
 }

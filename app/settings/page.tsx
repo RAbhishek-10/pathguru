@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAuth } from "@/contexts/AuthContext"
 import { toast } from "sonner"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 
 export default function SettingsPage() {
   const { user, updateProfile } = useAuth()
@@ -24,6 +25,8 @@ export default function SettingsPage() {
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [savingPassword, setSavingPassword] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [deleteEmailInput, setDeleteEmailInput] = useState("")
 
   useEffect(() => {
     if (!user) return
@@ -239,12 +242,53 @@ export default function SettingsPage() {
               <div>
                 <p className="mb-1 text-sm font-medium text-destructive">Delete Account</p>
                 <p className="mb-3 text-xs text-muted-foreground">Permanently delete your account and all associated data.</p>
-                <Button variant="destructive" size="sm">Delete My Account</Button>
+                <Button onClick={() => setShowDeleteDialog(true)} variant="destructive" size="sm">Delete My Account</Button>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
+
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="bg-card max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-destructive flex items-center gap-2">
+              Warning: Account Deletion
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground text-xs mt-1">
+              Deleting your account is permanent and cannot be undone. You will lose access to all your enrolled courses, purchase history, and test results.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="my-4">
+            <label className="text-xs font-semibold text-foreground mb-1 block">
+              Please type your email <code className="bg-muted px-1.5 py-0.5 rounded text-primary font-bold">{user?.email}</code> to confirm:
+            </label>
+            <Input
+              value={deleteEmailInput}
+              onChange={(e) => setDeleteEmailInput(e.target.value)}
+              placeholder={user?.email || "Verify your email"}
+              className="bg-background text-foreground text-sm mt-1"
+            />
+          </div>
+          <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+            <Button variant="outline" size="sm" onClick={() => { setShowDeleteDialog(false); setDeleteEmailInput("") }}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              disabled={deleteEmailInput !== user?.email}
+              onClick={() => {
+                toast.error("Account deletion requested. (Simulated Sandbox)")
+                setShowDeleteDialog(false)
+                setDeleteEmailInput("")
+              }}
+            >
+              Confirm Permanent Deletion
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

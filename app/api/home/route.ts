@@ -39,9 +39,18 @@ export async function GET() {
 
     const batchCounts = await db.batch.groupBy({ by: ["examSlug"], _count: { id: true } })
     const countMap = Object.fromEntries(batchCounts.map((b) => [b.examSlug, b._count.id]))
+    const mappedCats = categories.map((c) => toExamCategory(c, countMap[c.slug] ?? 0))
+
+    const seen = new Set<string>()
+    const uniqueCats = mappedCats.filter((item) => {
+      const lower = item.slug.toLowerCase()
+      if (seen.has(lower)) return false
+      seen.add(lower)
+      return true
+    })
 
     return {
-      examCategories: categories.map((c) => toExamCategory(c, countMap[c.slug] ?? 0)),
+      examCategories: uniqueCats,
       batches: batches.map(toBatch),
       faculty: faculty.map(toFacultyFromProfile),
       toppers: toppers.map(toTopper),
@@ -49,15 +58,24 @@ export async function GET() {
       blogPosts: blogPosts.map(toBlogPost),
       liveClasses: liveClasses.map(toLiveClass),
     }
-  }, () => ({
-    examCategories: mockExamCategories,
-    batches: mockBatches,
-    faculty: mockFaculty,
-    toppers: mockToppers,
-    testimonials: mockTestimonials,
-    blogPosts: mockBlogPosts,
-    liveClasses: mockLiveClasses,
-  }))
+  }, () => {
+    const seen = new Set<string>()
+    const uniqueCats = mockExamCategories.filter((item) => {
+      const lower = item.slug.toLowerCase()
+      if (seen.has(lower)) return false
+      seen.add(lower)
+      return true
+    })
+    return {
+      examCategories: uniqueCats,
+      batches: mockBatches,
+      faculty: mockFaculty,
+      toppers: mockToppers,
+      testimonials: mockTestimonials,
+      blogPosts: mockBlogPosts,
+      liveClasses: mockLiveClasses,
+    }
+  })
 
   return NextResponse.json(data)
 }

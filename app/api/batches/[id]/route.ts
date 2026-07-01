@@ -20,8 +20,14 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     if (!batch) return null
 
     let completedLectureIds = new Set<string>()
+    let isEnrolled = false
     const session = await requireAuth()
     if (!session.error && session.user) {
+      const enrollment = await db.enrollment.findUnique({
+        where: { userId_batchId: { userId: session.user.id, batchId: id } },
+      })
+      isEnrolled = !!enrollment || session.user.role === "ADMIN" || session.user.role === "FACULTY"
+
       const progress = await db.lectureProgress.findMany({
         where: { userId: session.user.id, lectureId: { in: batch.lectures.map((l) => l.id) }, completed: true },
       })
@@ -30,7 +36,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
     return {
       ...toBatch(batch),
-      lectures: batch.lectures.map((l) => toLecture(l, completedLectureIds.has(l.id))),
+      lectures: batch.lectures.map((l) => toLecture(l, completedLectureIds.has(l.id), isEnrolled)),
     }
   }, () => {
     const batch = mockBatches.find((b) => b.id === id)

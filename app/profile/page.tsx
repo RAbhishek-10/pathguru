@@ -102,7 +102,22 @@ export default function ProfilePage() {
                   <Copy className="h-4 w-4" />
                   <span className="sr-only">Copy referral code</span>
                 </Button>
-                <Button variant="outline" size="icon">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    if (typeof navigator !== "undefined" && navigator.share) {
+                      navigator.share({
+                        title: "PathGuru Referral",
+                        text: `Join PathGuru with my referral code ${user?.referralCode} and get study credits!`,
+                        url: window.location.origin
+                      }).catch(() => {})
+                    } else {
+                      navigator.clipboard.writeText(user?.referralCode || "")
+                      toast.success("Referral code copied to clipboard!")
+                    }
+                  }}
+                >
                   <Share2 className="h-4 w-4" />
                   <span className="sr-only">Share referral code</span>
                 </Button>

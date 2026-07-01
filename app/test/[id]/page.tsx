@@ -13,14 +13,24 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
 import type { TestSeries, Question } from "@/lib/types"
+import { useAuth } from "@/contexts/AuthContext"
+import { toast } from "sonner"
 
 type QStatus = "unanswered" | "answered" | "marked" | "marked_answered" | "visited"
 
 export default function TestEnginePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
+  const { isAuthenticated, isLoading: authLoading } = useAuth()
   const [test, setTest] = useState<TestSeries | null>(null)
   const [questions, setQuestions] = useState<Question[]>([])
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      toast.error("Please log in to attempt tests.")
+      router.push("/login")
+    }
+  }, [isAuthenticated, authLoading, router])
 
   useEffect(() => {
     fetch(`/api/tests/${id}`)

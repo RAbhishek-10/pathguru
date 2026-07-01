@@ -27,6 +27,7 @@ export default function TestSeriesListPage() {
   const [examFilter, setExamFilter] = useState("all")
   const [accessFilter, setAccessFilter] = useState("all") // all | free | paid
   const [modeFilter, setModeFilter] = useState("all") // all | practice | scheduled
+  const [activeTab, setActiveTab] = useState("all")
 
   const allTests = testSeries ?? []
 
@@ -50,7 +51,7 @@ export default function TestSeriesListPage() {
 
   // Unique exam slugs for filter
   const examSlugs = useMemo(() => {
-    const slugs = [...new Set(allTests.map((t) => t.examSlug))]
+    const slugs = [...new Set(allTests.map((t) => t.examSlug.toLowerCase()))]
     return slugs
   }, [allTests])
 
@@ -121,7 +122,7 @@ export default function TestSeriesListPage() {
         </Select>
       </div>
 
-      <Tabs defaultValue="all">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <div className="mb-6 flex items-center justify-between">
           <TabsList className="bg-muted">
             <TabsTrigger value="all" className="gap-1.5">
@@ -165,7 +166,7 @@ export default function TestSeriesListPage() {
               <Lock className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
               <p className="mb-2 text-sm font-medium text-foreground">No tests unlocked yet</p>
               <p className="mb-4 text-xs text-muted-foreground">Purchase a test series or attempt any free test to see it here.</p>
-              <Button className="bg-primary text-primary-foreground" onClick={() => {}}>
+              <Button className="bg-primary text-primary-foreground" onClick={() => setActiveTab("all")}>
                 Browse Tests
               </Button>
             </div>

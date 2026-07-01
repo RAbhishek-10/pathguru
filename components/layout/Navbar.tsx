@@ -1,9 +1,9 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X, Search, ShoppingCart, ChevronDown, BookOpen, LogOut, BarChart3, HelpCircle, Settings, Bell, LayoutDashboard, Users } from "lucide-react"
+import { Menu, X, Search, ShoppingCart, ChevronDown, BookOpen, LogOut, BarChart3, HelpCircle, Settings, Bell, LayoutDashboard, Users, Sun, Moon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet"
@@ -14,6 +14,7 @@ import { useCart } from "@/contexts/CartContext"
 import type { ExamCategory } from "@/lib/types"
 import { useFetch } from "@/lib/hooks/use-fetch"
 import { cn } from "@/lib/utils"
+import { useTheme } from "next-themes"
 
 const navLinks = [
   { href: "/exam-categories", label: "All Courses" },
@@ -30,7 +31,19 @@ export default function Navbar() {
   const { count } = useCart()
   const [megaOpen, setMegaOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const { theme, setTheme } = useTheme()
   const { data: examCategories } = useFetch<ExamCategory[]>("/api/exams", [])
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo(0, 0)
+    }
+  }, [pathname])
 
   const isTestPage = pathname?.startsWith("/test/")
   if (isTestPage) return null
@@ -86,6 +99,18 @@ export default function Navbar() {
 
         {/* Right section */}
         <div className="flex items-center gap-1">
+          {mounted && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-xl text-muted-foreground hover:text-foreground"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            >
+              {theme === "dark" ? <Sun className="h-5 w-5 text-amber-500" /> : <Moon className="h-5 w-5" />}
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+          )}
+
           <Link href="/exam-categories">
             <Button variant="ghost" size="icon" className="rounded-xl text-muted-foreground hover:text-foreground">
               <Search className="h-5 w-5" />
@@ -195,6 +220,19 @@ export default function Navbar() {
                 ) : (
                   <Button className="w-full" asChild>
                     <Link href="/login" onClick={() => setMobileOpen(false)}>Login / Register</Link>
+                  </Button>
+                )}
+                {mounted && (
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setTheme(theme === "dark" ? "light" : "dark")
+                      setMobileOpen(false)
+                    }}
+                    className="w-full justify-start gap-2 rounded-xl text-sm text-muted-foreground"
+                  >
+                    {theme === "dark" ? <Sun className="h-4 w-4 text-amber-500" /> : <Moon className="h-4 w-4" />}
+                    <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
                   </Button>
                 )}
               </div>

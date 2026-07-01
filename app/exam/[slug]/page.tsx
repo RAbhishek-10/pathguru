@@ -68,14 +68,16 @@ export default function ExamLandingPage({ params }: { params: Promise<{ slug: st
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link href="/scholarship"><Button variant="outline" className="gap-2"><Calendar className="h-4 w-4" /> Free Scholarship Test</Button></Link>
-              <Button className="gap-2 bg-primary text-primary-foreground"><BookOpen className="h-4 w-4" /> Browse Batches</Button>
+              <Button onClick={() => document.getElementById("batches-section")?.scrollIntoView({ behavior: "smooth" })} className="gap-2 bg-primary text-primary-foreground">
+                <BookOpen className="h-4 w-4" /> Browse Batches
+              </Button>
             </div>
           </div>
         </div>
       </section>
 
       {/* Batch Grid */}
-      <section className="mx-auto max-w-7xl px-4 py-12 lg:px-6">
+      <section id="batches-section" className="mx-auto max-w-7xl px-4 py-12 lg:px-6">
         <div className="mb-8 flex items-center justify-between">
           <h2 className="text-xl font-bold text-foreground">Available Batches ({examBatches.length})</h2>
           <Button variant="outline" size="sm" className="gap-2"><Filter className="h-4 w-4" /> Filters</Button>

@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { User, ArrowRight } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -20,26 +21,28 @@ export default function BlogPage() {
 
       <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {blogPosts.map((post) => (
-          <Card key={post.slug} className="group overflow-hidden border-border bg-card transition-shadow hover:shadow-md">
-            <div className="flex aspect-video items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5 p-6">
-              <Badge variant="secondary" className="text-xs">{post.readTime} read</Badge>
-            </div>
-            <CardContent className="p-5">
-              <p className="mb-2 text-xs text-muted-foreground">{post.date}</p>
-              <h2 className="mb-2 line-clamp-2 text-base font-semibold text-foreground transition-colors group-hover:text-primary">
-                {post.title}
-              </h2>
-              <p className="mb-4 line-clamp-3 text-sm text-muted-foreground">{post.excerpt}</p>
-              <footer className="flex items-center justify-between">
-                <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <User className="h-3 w-3" /> {post.author}
-                </span>
-                <span className="flex items-center gap-1 text-xs font-medium text-primary">
-                  Read more <ArrowRight className="h-3 w-3" />
-                </span>
-              </footer>
-            </CardContent>
-          </Card>
+          <Link key={post.slug} href={`/blog/${post.slug}`} className="block">
+            <Card className="group overflow-hidden border-border bg-card transition-shadow hover:shadow-md h-full">
+              <div className="flex aspect-video items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5 p-6">
+                <Badge variant="secondary" className="text-xs">{post.readTime} read</Badge>
+              </div>
+              <CardContent className="p-5">
+                <p className="mb-2 text-xs text-muted-foreground">{post.date}</p>
+                <h2 className="mb-2 line-clamp-2 text-base font-semibold text-foreground transition-colors group-hover:text-primary">
+                  {post.title}
+                </h2>
+                <p className="mb-4 line-clamp-3 text-sm text-muted-foreground">{post.excerpt}</p>
+                <footer className="flex items-center justify-between">
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <User className="h-3 w-3" /> {post.author}
+                  </span>
+                  <span className="flex items-center gap-1 text-xs font-medium text-primary">
+                    Read more <ArrowRight className="h-3 w-3" />
+                  </span>
+                </footer>
+              </CardContent>
+            </Card>
+          </Link>
         ))}
       </section>
     </main>

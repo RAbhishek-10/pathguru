@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { FileText, Download, Filter, BookOpen, FlaskConical, Calculator, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -77,7 +78,9 @@ export default function NotesPage() {
                   <Badge variant="secondary" className="text-xs capitalize">{note.type}</Badge>
                 </div>
               </div>
-              <h3 className="mb-1 text-sm font-semibold text-foreground">{note.title}</h3>
+              <Link href={`/notes/${note.id}`}>
+                <h3 className="mb-1 text-sm font-semibold text-foreground group-hover:text-primary transition-colors cursor-pointer">{note.title}</h3>
+              </Link>
               <p className="mb-3 text-xs text-muted-foreground">{note.subject} | {note.pages} pages</p>
               <div className="flex items-center justify-between">
                 {note.isFree ? (
@@ -85,9 +88,11 @@ export default function NotesPage() {
                 ) : (
                   <span className="text-sm font-bold text-foreground">{"₹"}{note.price}</span>
                 )}
-                <Button size="sm" variant={note.isFree ? "default" : "outline"} className={note.isFree ? "gap-1 bg-primary text-primary-foreground" : "gap-1"}>
-                  <Download className="h-3.5 w-3.5" /> {note.isFree ? "Download" : "Buy"}
-                </Button>
+                <Link href={`/notes/${note.id}`}>
+                  <Button size="sm" variant={note.isFree ? "default" : "outline"} className={note.isFree ? "gap-1 bg-primary text-primary-foreground" : "gap-1"}>
+                    <Download className="h-3.5 w-3.5" /> {note.isFree ? "Download" : "Buy"}
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>
